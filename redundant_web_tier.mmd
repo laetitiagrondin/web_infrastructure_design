@@ -1,0 +1,26 @@
+flowchart LR
+    user[User] --> lb["Load balancer (HAProxy)"]
+
+    subgraph path1["Web/App node 1"]
+        web1["Web server (Nginx)"] --> app1[Application server]
+    end
+
+    subgraph path2["Web/App node 2"]
+        web2["Web server (Nginx)"] --> app2[Application server]
+    end
+
+    lb -->|"Request"| web1
+    lb -->|"Request"| web2
+
+    app1 --> dbprimary["Database Primary (MySQL)"]
+    app2 --> dbprimary
+
+    dbprimary -->|"replication"| dbreplica["Database replica (MySQL)"]
+
+    dbprimary -->|"Response"| app1
+    dbprimary -->|"Response"| app2
+    app1 -->|"Response"| web1
+    app2 -->|"Response"| web2
+    web1 -->|"Response"| lb
+    web2 -->|"Response"| lb
+    lb -->|"Response"| user
