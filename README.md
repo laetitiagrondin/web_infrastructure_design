@@ -83,3 +83,25 @@ The database primary remains a write-availability risk because it is the only co
 ## *6. Collocated Services*
 
 When web, application and database services are collocated, they are more difficult to scale and maintain independently. Resource usage and maintenance on one service can affect the others because they share the same infrastructure.
+
+# 3. Separate Tiers and Remove the Load-Balancer SPOF
+
+## *0.Comparison with the Single-Server Design*
+
+Unlike the single-server design, this architecture separates the web, application and database services into distinct tiers and uses redundant instances. This reduces the dependence on one machine and removes the load balancer as a single point of failure at a conceptual level through a redundant load-balancer pair.
+
+## *1. Independent Scaling*
+
+Separated tiers can be scaled independently because each tier has its own resources and instances. For example, additional web or application servers can be added without necessarily increasing the number of database servers.
+
+## *2. Maintenance Isolation*
+
+Separating the tiers can reduce the impact of maintenance on unrelated components. Work on one tier can be performed without requiring every service in the infrastructure to be maintained or restarted at the same time.
+
+## *3. Evidence-Based Sizing*
+
+The number of instances should be based on measured demand, expected growth, failure tolerance and a justified safety margin. Instances should not simply be copied from a diagram or increased without evidence because unnecessary infrastructure increases cost and operational complexity.
+
+## *4. Remaining Limitations
+
+A database write-availability risk relains because the design does not define automatic database failover. The separated architecture also has higher infrastructure costs and greater operational complexity than the single-server design.
