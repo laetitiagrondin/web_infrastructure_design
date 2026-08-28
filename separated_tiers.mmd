@@ -1,0 +1,43 @@
+flowchart LR
+    user[User] --> lb1["Load balancer (HAProxy)"]
+    lb1 -->|"failover"| lb2["Load balancer (HAProxy)"]
+
+    subgraph webtier["Web tier"]
+        web1["Web server (Nginx)"]
+        web2["Web server (Nginx)"]
+    end
+
+    subgraph apptier["Application tier"]
+        app1[Application server]
+        app2[Application server]
+    end
+
+    subgraph databasetier["Database tier"]
+        dbprimary["Database primary (MySQL)"]
+        dbreplica["Database replica (MySQL)"]
+    end
+
+    lb1 --> web1
+    lb1 --> web2
+    lb2 --> web1
+    lb2 --> web2
+
+    web1 --> app1
+    web1 --> app2
+    web2 --> app1
+    web2 --> app2
+
+    app1 --> dbprimary
+    app2 --> dbprimary
+
+    dbprimary -->|"replication"| dbreplica
+
+    dbprimary -->|"Response"| app1
+    dbprimary -->|"Response"| app2
+    app1 -->|"Response"| web1
+    app1 -->|"Response"| web2
+    app2 -->|"Response"| web1
+    app2 -->|"Response"| web2
+    web1 -->|"Response"| lb1
+    web2 -->|"Response"| lb1
+    lb1 -->|"Response"| user
