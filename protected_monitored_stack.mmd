@@ -1,0 +1,40 @@
+flowchart LR
+    user[User] -->|"HTTPS"| firewall1[Firewall]
+    firewall1 --> lb["Load balancer (HAProxy)"]
+
+    subgraph group1["Web/App node 1"]
+        firewall2[Firewall] --> web1["Web server (Nginx)"]
+        web1 --> app1[Application server]
+    end
+
+    subgraph group2["Web/App node 2"]
+        firewall3[Firewall] --> web2["Web server (Nginx)"]
+        web2 --> app2[Application server]
+    end
+
+    lb --> firewall2
+    lb --> firewall3
+
+    app1 --> dbprimary["Database primary (MySQL)"]
+    app2 --> dbprimary
+    dbprimary -->|"replication"| dbreplica["Database replica (MySQL)"]
+
+    monitoring["Monitoring system"]
+
+    lb -->|"metrics"| monitoring
+    web1 -->|"QPS metrics"| monitoring
+    web2 -->|"QPS metrics"| monitoring
+    app1 -->|"metrics"| monitoring
+    app2 -->|"metrics"| monitoring
+    dbprimary -->|"metrics"| monitoring
+
+    dbprimary -->|"Response"| app1
+    dbprimary -->|"Response"| app2
+    app1 -->|"Response"| web1
+    app2 -->|"Response"| web2
+    web1 -->|"Response"| firewall2
+    web2 -->|"Response"| firewall3
+    firewall2 -->|"Response"| lb
+    firewall3 -->|"Response"| lb
+    lb -->|"Response"| firewall1
+    firewall1 -->|"Response"| user
