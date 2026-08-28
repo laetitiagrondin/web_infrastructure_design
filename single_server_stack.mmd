@@ -1,0 +1,16 @@
+flowchart LR
+    user[User] -->|"Request"| domain["www.foobar.com"]
+    domain --> dns[DNS]
+    dns -->|"A record → 8.8.8.8"| web
+
+    subgraph server["Server"]
+        web["web server (Nginx)"] -->|"Request"| appserver[Application server]
+        appserver -->|"Request"| code[Application code]
+        code -->|"Request"| database["Database (PostgreSQL / MySQL)"]
+
+        database -->|"Response"| code
+        code -->|"Response"| appserver
+        appserver -->|"Response"| web
+    end
+
+    web -->|"Response"| user
